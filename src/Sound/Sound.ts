@@ -3,7 +3,7 @@ import {Helper} from '../Helper/Helper';
 import {User} from "../User/User";
 import {getAudioDurationInSeconds} from 'get-audio-duration';
 import {isSoundOnCooldown, cooldownRemaining, setIsSoundOnCooldown, setCooldownRemaining} from './CooldownInfos';
-import {soundsList} from "../Bot/GlobalVars";
+import {soundsList, userRights} from "../Bot/GlobalVars";
 
 export class Sound {
 
@@ -74,6 +74,8 @@ export class Sound {
     private playSound = (sound: string, target: string, context: any): void => {
         if (this.soundExists(sound)) {
             let user: InstanceType<typeof User> = new User(context);
+
+            console.log(userRights);
             user.hasRightToPlaySounds().then((hasRight) => {
                 if (hasRight) {
                     if (!isSoundOnCooldown || user.isBroadcaster()) {
@@ -127,6 +129,8 @@ export class Sound {
 
         return fs.existsSync(SOUND_PATH) && soundsList?.indexOf(`!${sound}`) !== -1;
     }
+
+
 
     /**
      * @private

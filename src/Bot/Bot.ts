@@ -2,7 +2,7 @@ import {SoundModel} from '../Database/SoundModel';
 import {Message} from '../Message/Message';
 import {options} from "../Interface/BotOptionsInterface";
 import {dbFields} from "../Interface/DbTableFieldsInterface";
-import {setSoundsListAsGlobalVar} from './GlobalVars';
+import {setSoundsListAsGlobalVar, setSoundsCounterAsGlobalVar} from './GlobalVars';
 
 export class Bot {
 
@@ -22,9 +22,19 @@ export class Bot {
     private readonly client: any;
 
     /**
-     * @private
+     * @public
      */
     public preLoadedSounds: Array<string> = [];
+
+    /**
+     * @public
+     */
+    public soundsCounter: Array<object> = [];
+
+    /**
+     * @public
+     */
+    public preLoadedRights: Array<string> = [];
 
     /**
      * @param tmi
@@ -63,19 +73,23 @@ export class Bot {
     private connectClientToTwitch = (): void => {
         this.client.connect().then(() => {
             let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
-            soundModel.preLoadSounds().then((rows: dbFields | any) => {
-                if(rows.length > 0){
+
+            soundModel.preLoadSoundTable().then((rows: dbFields | any) => {
+                if (rows.length > 0) {
                     for (let i = 0; i < rows.length; i++) {
                         this.preLoadedSounds[i] = rows[i].command;
+                        this.soundsCounter[i] = {name: `?${rows[i].name}`, playedCount: rows[i].played_count};
                         setSoundsListAsGlobalVar(this.preLoadedSounds);
+                        setSoundsCounterAsGlobalVar(this.soundsCounter);
                     }
                     console.log('3 - All the sounds have been preloaded !');
-                }else{
+                } else {
                     console.log('> Error during the sounds preloading ! <');
                 }
             }).catch((e) => {
                 console.log('> Error during the sounds preloading ! <' + e);
             });
+
             this.sendBotMessageInChat(this.botSecrets.channels[0], this.BOT_MESSAGE, 25);
         }).catch((err: any) => {
             console.log(err);
@@ -105,7 +119,7 @@ export class Bot {
      * @param {string} message
      * @param {boolean} self
      */
-    private onMessageHandler = (target: string, context: {username: string}, message: string, self: boolean) => {
+    private onMessageHandler = (target: string, context: { username: string }, message: string, self: boolean) => {
         // Ignore messages from the bot
         if (self) {
             return;

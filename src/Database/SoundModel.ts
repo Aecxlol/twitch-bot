@@ -26,7 +26,7 @@ export class SoundModel extends AbstractModel{
      * @public
      * @returns {Promise<Array<string> | string>}
      */
-    public preLoadSounds = (): Promise<any> => {
+    public preLoadSoundTable = (): Promise<any> => {
         return new Promise((resolve, reject) => {
            this.query('select', this.table, {}, {}).then((rows: dbFields) => {
                    resolve(rows);
@@ -46,6 +46,20 @@ export class SoundModel extends AbstractModel{
             console.log(`${sound}'s count updated`);
         }).catch((err: object) => {
             console.error(err)
+        });
+    }
+
+    /**
+     * @public
+     * @returns {Promise<Array<string> | string>}
+     */
+    public getSoundsPlayCount = () => {
+        return new Promise((resolve, reject) => {
+            this.preLoadSoundTable().then((rows) => {
+                resolve(rows);
+            }).catch((err) => {
+                reject(err);
+            })
         });
     }
 }

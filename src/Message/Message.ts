@@ -1,7 +1,10 @@
 import {Helper} from '../Helper/Helper';
 import {Sound} from '../Sound/Sound';
 import {User} from "../User/User";
+import {SoundModel} from "../Database/SoundModel";
 import {BotCommands} from '../Bot/BotCommands';
+import {dbFields} from "../Interface/DbTableFieldsInterface";
+import {soundsList} from "../Bot/GlobalVars";
 
 export class Message {
 
@@ -83,24 +86,35 @@ export class Message {
         this.parse(this.message).then((msgType) => {
             switch (msgType) {
                 case this.REGULAR_COMMAND:
-                    /**
-                     * @todo faire un cache pour ceux qui ont les droits de jouer un son
-                     */
-
-                    const BOT_COMMAND = BotCommands.filter((commands) => {
+                    const BOT_REGULAR_COMMAND = BotCommands.filter((commands) => {
                         return commands.command === this.message;
                     });
 
-                    if(Helper.isEmpty(BOT_COMMAND)){
+                    if(Helper.isEmpty(BOT_REGULAR_COMMAND)){
                         new Sound(this.message, this.username, this.client, this.target, this.context);
                     }else{
-                        BOT_COMMAND[0].execute(this.client, this.target, this.username);
+                        BOT_REGULAR_COMMAND[0].execute(this.client, this.target, this.username);
                     }
                     break;
 
                 case this.QUESTION_COMMAND:
-                    if (!user.isBroadcaster()) {
-                        this.client.say(this.target, `Commandes désactivées, je mets le bot à jour`);
+                    const BOT_QUESTION_COMMAND = BotCommands.filter((commands) => {
+                        return commands.command === this.message;
+                    });
+
+                    if(Helper.isEmpty(BOT_QUESTION_COMMAND)){
+                        if(soundsList?.indexOf(this.message.replace('?', '!')) !== -1){
+                            let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
+                            soundModel.getSoundsPlayCount().then((rows: dbFields | any) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    if(this.message === `?${rows[i].name}`){
+                                        this.client.say(this.target, `!${rows[i].name} a été joué ${rows[i].played_count} fois`);
+                                    }
+                                }
+                            });
+                        }
+                    }else{
+                        BOT_QUESTION_COMMAND[0].execute(this.client, this.target, this.username);
                     }
                     break;
 

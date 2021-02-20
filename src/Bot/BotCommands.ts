@@ -24,5 +24,13 @@ export const BotCommands = [
         execute: (client: any, target: string, username: string) => {
             client.say(target, `@${username} 2Head`);
         }
+    },
+    {
+        name: 'soundName',
+        command: '?nomDuSon',
+        type: 'questionCommand',
+        execute: (client: any, target: string, username: string) => {
+            client.say(target, `@${username} 2Head`);
+        }
     }
 ]

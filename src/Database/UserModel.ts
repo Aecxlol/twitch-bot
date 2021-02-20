@@ -25,4 +25,14 @@ export class UserModel extends AbstractModel {
             });
         });
     }
+
+    preLoadUsersRight = () => {
+        return new Promise((resolve, reject) => {
+           this.query('select', this.table, {}, {}).then((rows) => {
+              resolve(rows);
+           }).catch((err) => {
+               reject(err);
+           });
+        });
+    }
 }
