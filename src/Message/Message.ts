@@ -5,6 +5,7 @@ import {SoundModel} from "../Database/SoundModel";
 import {BotCommands} from '../Bot/BotCommands';
 import {dbFields} from "../Interface/DbTableFieldsInterface";
 import {soundsList} from "../Bot/GlobalVars";
+import {Admin} from "../Admin/Admin";
 
 export class Message {
 
@@ -90,9 +91,9 @@ export class Message {
                         return commands.command === this.message;
                     });
 
-                    if(Helper.isEmpty(BOT_REGULAR_COMMAND)){
+                    if (Helper.isEmpty(BOT_REGULAR_COMMAND)) {
                         new Sound(this.message, this.username, this.client, this.target, this.context);
-                    }else{
+                    } else {
                         BOT_REGULAR_COMMAND[0].execute(this.client, this.target, this.username);
                     }
                     break;
@@ -102,25 +103,25 @@ export class Message {
                         return commands.command === this.message;
                     });
 
-                    if(Helper.isEmpty(BOT_QUESTION_COMMAND)){
-                        if(soundsList?.indexOf(this.message.replace('?', '!')) !== -1){
+                    if (Helper.isEmpty(BOT_QUESTION_COMMAND)) {
+                        if (soundsList?.indexOf(this.message.replace('?', '!')) !== -1) {
                             let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
                             soundModel.getSoundsPlayCount().then((rows: dbFields | any) => {
                                 for (let i = 0; i < rows.length; i++) {
-                                    if(this.message === `?${rows[i].name}`){
+                                    if (this.message === `?${rows[i].name}`) {
                                         this.client.say(this.target, `!${rows[i].name} a été joué ${rows[i].played_count} fois`);
                                     }
                                 }
                             });
                         }
-                    }else{
+                    } else {
                         BOT_QUESTION_COMMAND[0].execute(this.client, this.target, this.username);
                     }
                     break;
 
                 case this.ADMIN_COMMAND:
                     if (user.isBroadcaster()) {
-
+                        new Admin(this.message.split(' ')[1], this.message.split(' ')[2], this.client, this.target);
                     } else {
                         this.client.say(this.target, 'Commande réservée aux admins SeriousSloth');
                     }

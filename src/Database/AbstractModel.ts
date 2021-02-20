@@ -77,9 +77,9 @@ export abstract class AbstractModel {
         return new Promise((resolve, reject) => {
             switch (queryType) {
                 case 'select':
-                    if(Helper.isEmpty(whereInfosContainer)) {
+                    if (Helper.isEmpty(whereInfosContainer)) {
                         this.sqlStatement = `SELECT * FROM ${table}`;
-                    }else {
+                    } else {
                         this.sqlStatement = `SELECT * FROM ${table} WHERE ${whereInfosContainer.field} = ?`;
                     }
                     this.dbConnector.query(this.sqlStatement, whereInfosContainer.fieldValue, (err: any, rows: dbFields, _fields: any) => {
@@ -93,15 +93,21 @@ export abstract class AbstractModel {
                 case 'update':
                     this.sqlStatement = `UPDATE ${table} SET ${fieldsInfosContainer.fieldToUpdate} = ${fieldsInfosContainer.fieldToUpdateNewValue} WHERE ${whereInfosContainer.field} = ?`;
                     this.dbConnector.query(this.sqlStatement, whereInfosContainer.fieldValue, (err: any, rows: dbFields, _fields: any) => {
-                       if(err){
-                           reject(err);
-                       }
-                       resolve(rows);
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(rows);
                     });
                     break;
 
                 case 'insert':
-
+                    this.sqlStatement = `INSERT INTO ${table} (${fieldsInfosContainer.fieldToUpdate}, ${fieldsInfosContainer.fieldToUpdate2}, ${fieldsInfosContainer.fieldToUpdate3}) VALUES ('${fieldsInfosContainer.fieldToUpdateNewValue}', '${fieldsInfosContainer.fieldToUpdateNewValue2}', '${fieldsInfosContainer.fieldToUpdateNewValue3}')`;
+                    this.dbConnector.query(this.sqlStatement, (err: any, rows: dbFields) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(rows);
+                    });
                     break;
 
                 default:
