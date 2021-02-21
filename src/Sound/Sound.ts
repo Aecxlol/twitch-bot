@@ -3,7 +3,7 @@ import {Helper} from '../Helper/Helper';
 import {User} from "../User/User";
 import {getAudioDurationInSeconds} from 'get-audio-duration';
 import {isSoundOnCooldown, cooldownRemaining, setIsSoundOnCooldown, setCooldownRemaining} from './CooldownInfos';
-import {soundsList, userRights} from "../Bot/GlobalVars";
+import {soundsList, soundsAreEnabled} from "../Bot/GlobalVars";
 
 export class Sound {
 
@@ -73,45 +73,47 @@ export class Sound {
      */
     private playSound = (sound: string, target: string, context: any): void => {
         if (this.soundExists(sound)) {
-            let user: InstanceType<typeof User> = new User(context);
+            if(soundsAreEnabled) {
+                let user: InstanceType<typeof User> = new User(context);
+                user.hasRightToPlaySounds().then((hasRight) => {
+                    if (hasRight) {
+                        if (!isSoundOnCooldown || user.isBroadcaster()) {
+                            const SOUND_PATH = `${this.SOUND_FOLDER_PATH}${sound}${this.SOUND_EXTENSION}`;
+                            getAudioDurationInSeconds(SOUND_PATH).then((duration) => {
+                                this.SOUND_PLAY.play(`${this.SOUND_FOLDER_PATH}${sound}${this.SOUND_EXTENSION}`);
+                                setIsSoundOnCooldown(true);
+                                this.cooldownRemaining = duration + this.soundCooldown;
+                                this.cooldownRemaining = Math.ceil(this.cooldownRemaining);
 
-            console.log(userRights);
-            user.hasRightToPlaySounds().then((hasRight) => {
-                if (hasRight) {
-                    if (!isSoundOnCooldown || user.isBroadcaster()) {
-                        const SOUND_PATH = `${this.SOUND_FOLDER_PATH}${sound}${this.SOUND_EXTENSION}`;
-                        getAudioDurationInSeconds(SOUND_PATH).then((duration) => {
-                            this.SOUND_PLAY.play(`${this.SOUND_FOLDER_PATH}${sound}${this.SOUND_EXTENSION}`);
-                            setIsSoundOnCooldown(true);
-                            this.cooldownRemaining = duration + this.soundCooldown;
-                            this.cooldownRemaining = Math.ceil(this.cooldownRemaining);
+                                setCooldownRemaining(this.cooldownRemaining);
+                                this.soundInterval = setInterval(() => {
+                                    if (this.cooldownRemaining && this.cooldownRemaining > 0) {
+                                        this.cooldownRemaining--;
+                                        setCooldownRemaining(this.cooldownRemaining);
+                                    }
+                                }, 1000);
 
-                            setCooldownRemaining(this.cooldownRemaining);
-                            this.soundInterval = setInterval(() => {
-                                if (this.cooldownRemaining && this.cooldownRemaining > 0) {
-                                    this.cooldownRemaining--;
-                                    setCooldownRemaining(this.cooldownRemaining);
-                                }
-                            }, 1000);
+                                setTimeout(() => {
+                                    clearInterval(this.soundInterval);
+                                    setIsSoundOnCooldown(false);
+                                }, this.cooldownRemaining * 1000);
 
-                            setTimeout(() => {
-                                clearInterval(this.soundInterval);
-                                setIsSoundOnCooldown(false);
-                            }, this.cooldownRemaining * 1000);
-
-                            let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
-                            soundModel.updateSoundPlayedCount(`!${sound}`);
-                            console.log(`Sound : ${sound} requested by ${Helper.uppercaseFirstLetter(this.username)}`);
-                        });
+                                let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
+                                soundModel.updateSoundPlayedCount(`!${sound}`);
+                                console.log(`Sound : ${sound} requested by ${Helper.uppercaseFirstLetter(this.username)}`);
+                            });
+                        } else {
+                            this.displayErrorMessage(target);
+                        }
                     } else {
-                        this.displayErrorMessage(target);
+                        this.client.say(target, `T'as pas les droits @${this.username} KEKW`);
                     }
-                } else {
-                    this.client.say(target, `T'as pas les droits @${this.username} KEKW`);
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
+                }).catch((err) => {
+                    console.log(err);
+                });
+            } else {
+                this.client.say(target, `Les sons sont pour le moment désactivés @${this.username}`);
+            }
         } else {
             console.error(`The sound or command: ${sound} does not exist`);
         }
