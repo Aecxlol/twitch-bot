@@ -1,3 +1,4 @@
+import {twitchApiResponse} from '../Interface/ApiTwitchResponse';
 // SOUNDS RELATED
 let soundsList: Array<string> | null = null;
 let newSoundsList: string;
@@ -24,4 +25,24 @@ function setUserRightsAsGlobalVar(v: Array<string>) {
     userRights = v;
 }
 
-export {soundsList, setSoundsListAsGlobalVar, newSoundsList, setUserRightsAsGlobalVar, userRights, setSoundsCounterAsGlobalVar, soundsCounter, setSoundsAreEnabled, soundsAreEnabled}
+// USERS RELATED
+let followers: twitchApiResponse;
+
+function setFollowersListAsGlobalVar(v: twitchApiResponse) {
+    followers = v
+}
+
+export {
+    soundsList,
+    setSoundsListAsGlobalVar,
+    newSoundsList,
+    setUserRightsAsGlobalVar,
+    userRights,
+    setSoundsCounterAsGlobalVar,
+    soundsCounter,
+    setSoundsAreEnabled,
+    soundsAreEnabled,
+    followers,
+    setFollowersListAsGlobalVar
+}
+

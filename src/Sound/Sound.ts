@@ -40,7 +40,7 @@ export class Sound {
     /**
      * @private
      */
-    private soundCooldown: number = 1;
+    private soundCooldown: number = 0;
 
     /**
      * @private

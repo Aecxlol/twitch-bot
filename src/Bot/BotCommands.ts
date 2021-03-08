@@ -32,5 +32,13 @@ export const BotCommands = [
         execute: (client: any, target: string, username: string) => {
             client.say(target, `@${username} 2Head`);
         }
+    },
+    {
+        name: 'followAge',
+        command: '!followage',
+        type: 'regularCommand',
+        execute: (client: any, target: string, username: string) => {
+            client.say(target, `@${username} Soon`);
+        }
     }
 ]

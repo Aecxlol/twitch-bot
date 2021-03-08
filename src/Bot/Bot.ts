@@ -1,8 +1,10 @@
 import {SoundModel} from '../Database/SoundModel';
+import {UserModel} from '../Database/UserModel';
 import {Message} from '../Message/Message';
 import {options} from "../Interface/BotOptionsInterface";
 import {dbFields} from "../Interface/DbTableFieldsInterface";
-import {setSoundsListAsGlobalVar, setSoundsCounterAsGlobalVar} from './GlobalVars';
+import {setSoundsListAsGlobalVar, setSoundsCounterAsGlobalVar, followers} from './GlobalVars';
+import {BOT_SECRETS} from './options/bot';
 
 export class Bot {
 
@@ -38,13 +40,11 @@ export class Bot {
 
     /**
      * @param tmi
-     * @param botSecrets
      */
-    constructor(tmi: any, botSecrets: options) {
-        this.botSecrets = botSecrets;
+    constructor(tmi: any) {
+        this.botSecrets = BOT_SECRETS;
         // Create a client with our options
         this.client = new tmi.client(this.botSecrets);
-
         this.init();
     }
 
@@ -72,8 +72,8 @@ export class Bot {
      */
     private connectClientToTwitch = (): void => {
         this.client.connect().then(() => {
+            // PRELOADING SOUNDS
             let soundModel: InstanceType<typeof SoundModel> = new SoundModel();
-
             soundModel.preLoadSoundTable().then((rows: dbFields | any) => {
                 if (rows.length > 0) {
                     for (let i = 0; i < rows.length; i++) {
@@ -90,7 +90,27 @@ export class Bot {
                 console.log('> Error during the sounds preloading ! <' + e);
             });
 
-            this.sendBotMessageInChat(this.botSecrets.channels[0], this.BOT_MESSAGE, 25);
+            let channel = this.botSecrets.channels[0];
+            this.sendBotMessageInChat(channel, this.BOT_MESSAGE, 25);
+
+            // ADD NEW FOLLOWER TO THE DB
+            let userModel: InstanceType<typeof UserModel> = new UserModel();
+            for (let i = 0; i < followers.total; i++) {
+
+                let followDate = new Date(followers.data[i].followed_at).toISOString().slice(0, 19).replace('T', ' ');
+
+                userModel.checkIfUserExists(followers.data[i].from_name).then((results: any) => {
+                    if(results.length === 0) {
+                        userModel.addUser(followers.data[i].from_name, 0, parseInt(followers.data[i].from_id), followDate).then((done) => {
+                            if(done) {
+                                console.log(`${followers.data[i].from_name} has been successfully added to the DB.`);
+                            }
+                        }).catch((err) => {
+                            console.error(err)
+                        });
+                    }
+                });
+            }
         }).catch((err: any) => {
             console.log(err);
         });
@@ -98,9 +118,9 @@ export class Bot {
 
     /**
      * @private
-     * @param{string} channel
-     * @param{string} message
-     * @param{number} delayBetweenMessageInMinutes
+     * @param {string} channel
+     * @param {string} message
+     * @param {number} delayBetweenMessageInMinutes
      * @returns {void}
      */
     private sendBotMessageInChat = (channel: string, message: string, delayBetweenMessageInMinutes: number): void => {
@@ -124,7 +144,6 @@ export class Bot {
         if (self) {
             return;
         }
-
         new Message(target, context, message.trim(), this.client);
     }
 

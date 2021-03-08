@@ -22,11 +22,31 @@ export class UserModel extends AbstractModel {
      */
     private fieldHasRightToPlaySounds = 'has_right_to_play_sounds';
 
+    /**
+     * @private
+     */
+    private fieldSelfId = 'self_id';
+
+    /**
+     * @private
+     */
+    private fieldFollowedAt = 'followed_at';
+
     constructor() {
         super();
     }
 
     getUserRightToPlayASound = (user: string) => {
+        return new Promise((resolve, reject) => {
+            this.query('select', this.table, {field: this.fieldName, fieldValue: user}, {}).then((rows) => {
+                resolve(rows);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    checkIfUserExists = (user: string) => {
         return new Promise((resolve, reject) => {
             this.query('select', this.table, {field: this.fieldName, fieldValue: user}, {}).then((rows) => {
                 resolve(rows);
@@ -66,9 +86,9 @@ export class UserModel extends AbstractModel {
         });
     }
 
-    addUser = (user: string, perm: number) => {
+    addUser = (user: string, perm: number, selfId: number, followedAt: string) => {
         return new Promise((resolve, reject) => {
-            this.query('insert', this.table, {}, {fieldToUpdate: this.fieldName, fieldToUpdate2: this.fieldRole, fieldToUpdate3: this.fieldHasRightToPlaySounds, fieldToUpdateNewValue: user, fieldToUpdateNewValue2: 'none', fieldToUpdateNewValue3: perm}).then(() => {
+            this.query('insert', this.table, {}, {fieldToUpdate: this.fieldName, fieldToUpdate2: this.fieldRole, fieldToUpdate3: this.fieldHasRightToPlaySounds, fieldToUpdate4: this.fieldSelfId, fieldToUpdate5: this.fieldFollowedAt, fieldToUpdateNewValue: user, fieldToUpdateNewValue2: 'none', fieldToUpdateNewValue3: perm, fieldToUpdateNewValue4: selfId, fieldToUpdateNewValue5: followedAt}).then(() => {
                 resolve(true);
             }).catch((err) => {
                 reject(err);

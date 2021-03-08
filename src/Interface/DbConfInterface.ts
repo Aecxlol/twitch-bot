@@ -1,7 +1,7 @@
 export interface dbConf {
-    connectionLimit: number;
-    host: string;
-    user: string;
-    password: string;
-    database: string;
+    connectionLimit: string | undefined;
+    host: string | undefined;
+    user: string | undefined;
+    password: string | undefined;
+    database: string | undefined;
 }

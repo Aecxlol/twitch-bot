@@ -1,5 +1,9 @@
+import * as dotenv from 'dotenv';
 import * as tmi from 'tmi.js';
-import {ENV_VAR} from './secrets/bot';
 import {Bot} from './Bot/Bot';
+import {Twitch} from "./Api/Twitch";
 
-new Bot(tmi, ENV_VAR);
+dotenv.config();
+
+new Twitch();
+new Bot(tmi);

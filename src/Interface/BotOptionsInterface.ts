@@ -1,4 +1,4 @@
 export interface options {
-    identity: {username: string, password: string};
-    channels: Array<string>;
+    identity: {username: string | undefined, password: string | undefined};
+    channels: Array<any>;
 }

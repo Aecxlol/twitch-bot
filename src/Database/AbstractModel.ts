@@ -4,7 +4,7 @@ import {whereClause} from "../Interface/DbWhereConditionInterface";
 import {setClause} from "../Interface/DbSetConditionInterface";
 import {dbFields} from "../Interface/DbTableFieldsInterface";
 import * as mysql from 'mysql';
-import {DB_CONF} from '../secrets/database';
+import {DB_CONF} from '../Database/conf/database';
 
 export abstract class AbstractModel {
 
@@ -43,7 +43,7 @@ export abstract class AbstractModel {
         });
     }
 
-    connect = (connectionLimit: number, host: string, user: string, password: string, database: string) => {
+    connect = (connectionLimit: string | undefined, host: string | undefined, user: string | undefined, password: string | undefined, database: string | undefined) => {
         return new Promise((resolve, reject) => {
 
             this.dbConnector = this.mysql.createPool({
@@ -101,7 +101,7 @@ export abstract class AbstractModel {
                     break;
 
                 case 'insert':
-                    this.sqlStatement = `INSERT INTO ${table} (${fieldsInfosContainer.fieldToUpdate}, ${fieldsInfosContainer.fieldToUpdate2}, ${fieldsInfosContainer.fieldToUpdate3}) VALUES ('${fieldsInfosContainer.fieldToUpdateNewValue}', '${fieldsInfosContainer.fieldToUpdateNewValue2}', '${fieldsInfosContainer.fieldToUpdateNewValue3}')`;
+                    this.sqlStatement = `INSERT INTO ${table} (${fieldsInfosContainer.fieldToUpdate}, ${fieldsInfosContainer.fieldToUpdate2}, ${fieldsInfosContainer.fieldToUpdate3}, ${fieldsInfosContainer.fieldToUpdate4}, ${fieldsInfosContainer.fieldToUpdate5}) VALUES ('${fieldsInfosContainer.fieldToUpdateNewValue}', '${fieldsInfosContainer.fieldToUpdateNewValue2}', '${fieldsInfosContainer.fieldToUpdateNewValue3}', '${fieldsInfosContainer.fieldToUpdateNewValue4}', '${fieldsInfosContainer.fieldToUpdateNewValue5}')`;
                     this.dbConnector.query(this.sqlStatement, (err: any, rows: dbFields) => {
                         if (err) {
                             reject(err);
