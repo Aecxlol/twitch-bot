@@ -1,4 +1,5 @@
-import {soundsList, newSoundsList} from './GlobalVars';
+import {soundsList, newSoundsList, currentBotAccent, botAccents} from './GlobalVars';
+import * as say from 'say';
 
 export const BotCommands = [
     {
@@ -39,6 +40,38 @@ export const BotCommands = [
         type: 'regularCommand',
         execute: (client: any, target: string, username: string) => {
             client.say(target, `@${username} Soon`);
+        }
+    },
+    {
+        name: '!accentsList',
+        command: '!accentsList',
+        type: 'regularCommand',
+        execute: (client: any, target: string, username: string) => {
+            let accentsList: any = [];
+            let accents: any = [];
+
+            Object.keys(botAccents).map((k) => {
+                accentsList.push(k.split(' ')[1]);
+            });
+
+            Object.values(botAccents).map((v) => {
+                accents.push(v);
+            });
+
+            for (let i = 0; i < accentsList.length; i++) {
+                accentsList[i] += ` ${accents[i]}`
+            }
+
+            client.say(target, accentsList.join(' - '));
+        }
+    },
+    {
+        name: 'botCurrentAccent',
+        command: '!botCurrentAccent',
+        type: 'regularCommand',
+        execute: (client: any, target: string, username: string) => {
+            let accentName = currentBotAccent.split(' ')[1];
+            client.say(target, `Accent actuel du bot : ${accentName} -> ${botAccents[currentBotAccent]}`);
         }
     }
 ]

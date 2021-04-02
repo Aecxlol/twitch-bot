@@ -4,8 +4,9 @@ import {User} from "../User/User";
 import {SoundModel} from "../Database/SoundModel";
 import {BotCommands} from '../Bot/BotCommands';
 import {dbFields} from "../Interface/DbTableFieldsInterface";
-import {soundsList} from "../Bot/GlobalVars";
+import {soundsList, currentBotAccent, setCDState, onCD} from "../Bot/GlobalVars";
 import {Admin} from "../Admin/Admin";
+import * as say from 'say';
 
 export class Message {
 
@@ -54,6 +55,11 @@ export class Message {
      * @private
      */
     private readonly QUESTION_COMMAND: string = 'questionCommand';
+
+    /**
+     * @private
+     */
+    private readonly TTS_COMMAND: string = 'ttsCommand';
 
     /**
      * @private
@@ -127,6 +133,36 @@ export class Message {
                     }
                     break;
 
+                case this.TTS_COMMAND:
+
+                    if(!onCD || user.isBroadcaster()){
+                        setCDState(true);
+                        user.hasRightToUseTTS().then((hasRight) => {
+                            if (hasRight) {
+                                let textToSpeechSplitted: Array<any> = this.message.split(' ');
+                                let textToSpeechArray: Array<any> = [];
+                                let textToSpeech: string = '';
+
+                                for (let i = 1; i < textToSpeechSplitted.length; i++) {
+                                    textToSpeechArray[i - 1] = `${textToSpeechSplitted[i]}`;
+                                }
+
+                                textToSpeech = textToSpeechArray.join(' ');
+                                textToSpeech = textToSpeech.replace(/é/g, "e");
+
+                                say.speak(textToSpeech, currentBotAccent, 1.0, () => {
+                                    setCDState(false);
+                                });
+
+                            } else {
+                                this.client.say(this.target, 'T\'as pas les droits KEKW');
+                            }
+                        })
+                    }else{
+                        this.client.say(this.target, `@${this.username} Commande !tts en cd -> une phrase à la fois.`);
+                    }
+                    break;
+
                 case this.REGULAR_MESSAGE:
 
                     break;
@@ -148,6 +184,8 @@ export class Message {
                 this.messageType = this.QUESTION_COMMAND;
             } else if (message.match(/^!(\badmin)\s[a-zA-z]+\s.+$/)) {
                 this.messageType = this.ADMIN_COMMAND;
+            } else if (message.match(/^!(\btts)\s.+$/)) {
+                this.messageType = this.TTS_COMMAND;
             } else {
                 this.messageType = this.REGULAR_MESSAGE;
             }

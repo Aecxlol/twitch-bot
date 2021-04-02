@@ -95,4 +95,14 @@ export class UserModel extends AbstractModel {
             });
         });
     }
+
+    getUserRightToUseTTS = (user: string) => {
+        return new Promise((resolve, reject) => {
+            this.getUserRightToPlayASound(user).then((rows) => {
+                resolve(rows);
+            }).catch((err) => {
+                reject(err)
+            });
+        });
+    }
 }

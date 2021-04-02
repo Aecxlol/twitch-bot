@@ -3,7 +3,7 @@ import {UserModel} from '../Database/UserModel';
 import {Message} from '../Message/Message';
 import {options} from "../Interface/BotOptionsInterface";
 import {dbFields} from "../Interface/DbTableFieldsInterface";
-import {setSoundsListAsGlobalVar, setSoundsCounterAsGlobalVar, followers} from './GlobalVars';
+import {setSoundsListAsGlobalVar, setSoundsCounterAsGlobalVar, followers, loadBotAccents} from './GlobalVars';
 import {BOT_SECRETS} from './options/bot';
 
 export class Bot {
@@ -11,7 +11,7 @@ export class Bot {
     /**
      * @private
      */
-    private BOT_MESSAGE: string = 'Commandes disponibles : !sonsdispos (sons disponibles) - !nomDuSon (jouer un son) - ?nomDuSon (combien de fois un son a été joué) - !animelist';
+    private BOT_MESSAGE: string = 'Commandes disponibles : !sonsdispos (sons disponibles) - !nomDuSon (jouer un son) - ?nomDuSon (combien de fois un son a été joué) - !animelist - !tts votreMessage (votre message sera lu à haute voix par un bot) - !setAccent nomAccent (choisir l\'accent du bot) - !botCurrentAccent (voir l\'accent en cours utilisé) - !accentsList (voir la liste des accents disponibles)';
 
     /**
      * @private
@@ -111,6 +111,7 @@ export class Bot {
                     }
                 });
             }
+            loadBotAccents();
         }).catch((err: any) => {
             console.log(err);
         });

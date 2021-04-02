@@ -32,7 +32,7 @@ export class User {
     /**
      * @param context
      */
-    constructor(context: {username: string}) {
+    constructor(context: { username: string }) {
         this.context = context;
         this.getUserRight();
     }
@@ -43,11 +43,29 @@ export class User {
             let userModel = new UserModel();
             let username = this.context.username;
             userModel.getUserRightToPlayASound(username).then((rows: dbFields | any) => {
-                if(rows.length > 0){
+                if (rows.length > 0) {
                     resolve(rows[0].has_right_to_play_sounds === 1);
-                }else if(this.isBroadcaster()){
+                } else if (this.isBroadcaster()) {
                     resolve(true);
-                }else{
+                } else {
+                    resolve(false);
+                }
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public hasRightToUseTTS = () => {
+        return new Promise((resolve, reject) => {
+            let userModel = new UserModel();
+            let username = this.context.username;
+            userModel.getUserRightToUseTTS(username).then((rows: dbFields | any) => {
+                if (rows.length > 0) {
+                    resolve(rows[0].has_right_to_tts === 1);
+                } else if (this.isBroadcaster()) {
+                    resolve(true);
+                } else {
                     resolve(false);
                 }
             }).catch((err) => {
@@ -80,7 +98,7 @@ export class User {
                     this.userRole[i] = role[i].split('/')[0];
                 }
             } else {
-                role             = this.context[this.BADGES_KEY].split('/');
+                role = this.context[this.BADGES_KEY].split('/');
                 this.userRole[0] = role[0];
             }
         } else {

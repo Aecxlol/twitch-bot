@@ -56,7 +56,6 @@ export class Sound {
         this.sound = sound.split('!')[1];
         this.username = username;
         this.client = client;
-
         this.init(this.sound, target, context);
     }
 
