@@ -1,0 +1,30 @@
+{
+  "name": "aecxbotv2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -k -n \"Typescript,Node\" -p \"[{name}]\" -c \"blue,green\" \"npx tsc --watch\" \"nodemon dist/app.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "get-audio-duration": "^2.0.3",
+    "mysql": "^2.18.1",
+    "request": "^2.88.2",
+    "say": "^0.16.0",
+    "sound-play": "^1.1.0",
+    "tmi.js": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.17",
+    "@types/node": "^14.14.25",
+    "@types/request": "^2.48.5",
+    "@types/tmi.js": "^1.7.1",
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.1.4"
+  }
+}
